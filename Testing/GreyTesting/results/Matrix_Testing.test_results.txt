@@ -1,0 +1,50 @@
+Test Results: Matrix_Testing.test.js
+Duration: 10.33 seconds
+
+STDOUT:
+Running Matrix Testing
+
+Test Matrix 1: Leave Application Form Validation
+
+
+STDERR:
+Test failed: WebDriverError: unknown error: net::ERR_CONNECTION_REFUSED
+  (Session info: chrome=136.0.7103.114)
+    at Object.throwDecodedError (c:\Users\35kal\Desktop\Hackathon\SeleniumTestingProject\GatePass\GatePass\gate-pass-main 2\gate-pass-main 2\gate-pass-main 2\Testing\node_modules\selenium-webdriver\lib\error.js:523:15)
+    at parseHttpResponse (c:\Users\35kal\Desktop\Hackathon\SeleniumTestingProject\GatePass\GatePass\gate-pass-main 2\gate-pass-main 2\gate-pass-main 2\Testing\node_modules\selenium-webdriver\lib\http.js:524:13)
+    at Executor.execute (c:\Users\35kal\Desktop\Hackathon\SeleniumTestingProject\GatePass\GatePass\gate-pass-main 2\gate-pass-main 2\gate-pass-main 2\Testing\node_modules\selenium-webdriver\lib\http.js:456:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Driver.execute (c:\Users\35kal\Desktop\Hackathon\SeleniumTestingProject\GatePass\GatePass\gate-pass-main 2\gate-pass-main 2\gate-pass-main 2\Testing\node_modules\selenium-webdriver\lib\webdriver.js:745:17)
+    at async testLeaveApplicationFormMatrix (c:\Users\35kal\Desktop\Hackathon\SeleniumTestingProject\GatePass\GatePass\gate-pass-main 2\gate-pass-main 2\gate-pass-main 2\Testing\GreyTesting\Matrix_Testing.test.js:49:3)
+    at async runTests (c:\Users\35kal\Desktop\Hackathon\SeleniumTestingProject\GatePass\GatePass\gate-pass-main 2\gate-pass-main 2\gate-pass-main 2\Testing\GreyTesting\Matrix_Testing.test.js:30:5) {
+  remoteStacktrace: '\tGetHandleVerifier [0x00007FF7E608CF65+75717]\n' +
+    '\tGetHandleVerifier [0x00007FF7E608CFC0+75808]\n' +
+    '\t(No symbol) [0x00007FF7E5E58F9A]\n' +
+    '\t(No symbol) [0x00007FF7E5E559F4]\n' +
+    '\t(No symbol) [0x00007FF7E5E46789]\n' +
+    '\t(No symbol) [0x00007FF7E5E484F8]\n' +
+    '\t(No symbol) [0x00007FF7E5E46A96]\n' +
+    '\t(No symbol) [0x00007FF7E5E46516]\n' +
+    '\t(No symbol) [0x00007FF7E5E461DA]\n' +
+    '\t(No symbol) [0x00007FF7E5E43E8A]\n' +
+    '\t(No symbol) [0x00007FF7E5E4465C]\n' +
+    '\t(No symbol) [0x00007FF7E5E5CF3A]\n' +
+    '\t(No symbol) [0x00007FF7E5F0013E]\n' +
+    '\t(No symbol) [0x00007FF7E5ED737A]\n' +
+    '\t(No symbol) [0x00007FF7E5EFF39C]\n' +
+    '\t(No symbol) [0x00007FF7E5ED7153]\n' +
+    '\t(No symbol) [0x00007FF7E5EA0421]\n' +
+    '\t(No symbol) [0x00007FF7E5EA11B3]\n' +
+    '\tGetHandleVerifier [0x00007FF7E638D74D+3223469]\n' +
+    '\tGetHandleVerifier [0x00007FF7E6387CF2+3200338]\n' +
+    '\tGetHandleVerifier [0x00007FF7E63A5B23+3322755]\n' +
+    '\tGetHandleVerifier [0x00007FF7E60A6A3A+180890]\n' +
+    '\tGetHandleVerifier [0x00007FF7E60AE13F+211359]\n' +
+    '\tGetHandleVerifier [0x00007FF7E60952B4+109332]\n' +
+    '\tGetHandleVerifier [0x00007FF7E6095462+109762]\n' +
+    '\tGetHandleVerifier [0x00007FF7E607BA79+4825]\n' +
+    '\tBaseThreadInitThunk [0x00007FFD8949E8D7+23]\n' +
+    '\tRtlUserThreadStart [0x00007FFD8A17C5DC+44]\n'
+}
+
+

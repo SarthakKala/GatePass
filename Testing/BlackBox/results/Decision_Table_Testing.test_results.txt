@@ -1,0 +1,65 @@
+Test Results: Decision_Table_Testing.test.js
+Duration: 4.65 seconds
+
+STDOUT:
+Running Decision Table Tests
+
+Test 1: Leave Application Form Decision Table
+  Case: All fields filled
+  - From Date: 2025-05-21
+  - To Date: 2025-05-24
+  - Place: Home
+  - Reason: Family visit
+  - Submit button is enabled
+  - Expected result: Submittable
+  - Test PASSED
+
+  Case: Missing From Date
+  - From Date: empty
+  - To Date: 2025-05-24
+  - Place: Home
+  - Reason: Family visit
+  - Submit button is enabled
+  - Expected result: Not Submittable
+  - Test FAILED
+
+  Case: Missing To Date
+  - From Date: 2025-05-21
+  - To Date: empty
+  - Place: Home
+  - Reason: Family visit
+  - Submit button is enabled
+  - Expected result: Not Submittable
+  - Test FAILED
+
+  Case: Missing Place
+  - From Date: 2025-05-21
+  - To Date: 2025-05-24
+  - Place: empty
+  - Reason: Family visit
+  - Submit button is enabled
+  - Expected result: Not Submittable
+  - Test FAILED
+
+  Case: Missing Reason
+  - From Date: 2025-05-21
+  - To Date: 2025-05-24
+  - Place: Home
+  - Reason: empty
+  - Submit button is enabled
+  - Expected result: Not Submittable
+  - Test FAILED
+
+
+Test 2: Authentication Status Decision Table
+  Checking authentication status steps...
+  - Found 3 authentication steps
+  - Mail Sent step status: Done
+  - Parent Authentication step status: Pending
+  - Admin Authentication step status: Pending
+  This is a partial test as we cannot manipulate authentication states directly.
+  A full test would verify all combinations of parent and admin authentication.
+
+All decision table tests completed!
+
+

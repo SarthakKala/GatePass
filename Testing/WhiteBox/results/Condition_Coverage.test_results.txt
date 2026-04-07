@@ -1,0 +1,18 @@
+Test Results: Condition_Coverage.test.js
+Duration: 2.30 seconds
+
+STDOUT:
+Running Condition Test 1: Parent and Admin Auth Conditions
+  Found 3 steps on waiting page
+  ✓ Parent and Admin Auth conditions structure verified
+Running Condition Test 2: Step Component Status Conditions
+  Step 1 has color class: text-lg font-semibold transition-all duration-300 text-green-600
+  Step 2 has color class: text-lg font-semibold transition-all duration-300 text-gray-500
+  Step 3 has color class: text-lg font-semibold transition-all duration-300 text-gray-500
+  ✓ Step status conditions verified through color classes
+Running Condition Test 3: Authentication Condition via Auth Page
+  ✓ Auth condition with token verified
+  ✓ Auth condition without token verified
+All condition tests completed successfully!
+
+

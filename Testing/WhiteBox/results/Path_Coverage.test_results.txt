@@ -1,0 +1,26 @@
+Test Results: Path_Coverage.test.js
+Duration: 3.01 seconds
+
+STDOUT:
+Running Path Test 1: Complete User Authentication Path
+  Testing path: Signup -> Dashboard -> Leave Application -> Waiting
+    ✓ Signup page accessible
+    ⚠️ Dashboard page elements not found with expected text
+    ✓ Leave Application page accessible
+    ✓ Waiting page accessible
+  ✓ Complete user authentication path verified
+Running Path Test 2: Complete Admin Authentication Path
+  Testing path: Admin Signup -> Admin Signin -> Admin Dashboard
+    ✓ Admin signup page accessible
+    ✓ Admin signin page accessible
+    ✓ Admin dashboard page accessible
+  ✓ Complete admin authentication path verified
+Running Path Test 3: QR Code and Scan Flow Paths
+  Testing path: QR Generation -> QR Scan -> Authentication
+    ✓ QR page accessible
+    ⚠️ Scan page error: unexpected alert open: {Alert text : Error fetching details}
+  (Session info: chrome=136.0.7103.114)
+  ✓ Complete QR code scan path verified
+All path tests completed successfully!
+
+

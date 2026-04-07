@@ -1,0 +1,74 @@
+Test Results: Bottom_Up.test.js
+Duration: 5.65 seconds
+
+STDOUT:
+Running Bottom-Up Integration Testing
+
+Level 1: Form Components Integration
+  Testing form components integration
+  ✓ Email field integrated with HTML5 validation (type="email")
+  ⚠️ Name field not integrated with required attribute validation
+  ✓ Password field integrated with secure input type
+  ✓ Date field integrated with HTML5 date input
+  ✓ Date field properly handles input interaction
+  ⚠️ Submit button enabled even with empty form
+
+Level 2: Authentication Components Integration
+  Testing authentication components integration
+  ✓ Signin button correctly integrated with form validation
+  Using driver component to simulate authentication...
+  ✓ Successfully navigated to dashboard using driver component
+  ✓ Admin signin button correctly integrated with form validation
+  Using driver component to simulate admin authentication...
+  ✓ Successfully navigated to admin dashboard using driver component
+  ✓ Registration form components are correctly integrated
+
+Level 3: Leave Application Process Integration
+  Testing leave application process integration
+  ✓ Leave application form is correctly integrated with submit button
+  Using driver component to simulate form submission...
+  ✓ Successfully navigated to waiting page using driver component
+  ✓ Waiting page has 3 status step components integrated
+  ✓ Authentication status components are correctly integrated
+  Using driver component to simulate approval process...
+  ✓ QR code component is correctly integrated
+  Found 0 button components integrated with QR code page
+  Using driver component to simulate QR code scanning...
+  ✗ Error testing QR code scanning integration: unexpected alert open: {Alert text : Error fetching details}
+  (Session info: chrome=136.0.7103.114)
+
+Level 4: Admin Workflow Integration
+  Testing admin workflow integration
+
+
+STDERR:
+Test failed: UnexpectedAlertOpenError: unexpected alert open: {Alert text : Error fetching details}
+  (Session info: chrome=136.0.7103.114)
+    at Object.throwDecodedError (c:\Users\35kal\Desktop\Folder\WebDev\Projects_WebDev\gate-pass-main 2\gate-pass-main 2\Testing\node_modules\selenium-webdriver\lib\error.js:523:15)
+    at parseHttpResponse (c:\Users\35kal\Desktop\Folder\WebDev\Projects_WebDev\gate-pass-main 2\gate-pass-main 2\Testing\node_modules\selenium-webdriver\lib\http.js:524:13)
+    at Executor.execute (c:\Users\35kal\Desktop\Folder\WebDev\Projects_WebDev\gate-pass-main 2\gate-pass-main 2\Testing\node_modules\selenium-webdriver\lib\http.js:456:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Driver.execute (c:\Users\35kal\Desktop\Folder\WebDev\Projects_WebDev\gate-pass-main 2\gate-pass-main 2\Testing\node_modules\selenium-webdriver\lib\webdriver.js:745:17)
+    at async testAdminWorkflowIntegration (c:\Users\35kal\Desktop\Folder\WebDev\Projects_WebDev\gate-pass-main 2\gate-pass-main 2\Testing\Integration\Bottom_Up.test.js:368:3)
+    at async runTests (c:\Users\35kal\Desktop\Folder\WebDev\Projects_WebDev\gate-pass-main 2\gate-pass-main 2\Testing\Integration\Bottom_Up.test.js:43:5) {
+  remoteStacktrace: '\tGetHandleVerifier [0x00007FF7658BCF65+75717]\n' +
+    '\tGetHandleVerifier [0x00007FF7658BCFC0+75808]\n' +
+    '\t(No symbol) [0x00007FF765688F9A]\n' +
+    '\t(No symbol) [0x00007FF76572FF0C]\n' +
+    '\t(No symbol) [0x00007FF765707153]\n' +
+    '\t(No symbol) [0x00007FF7656D0421]\n' +
+    '\t(No symbol) [0x00007FF7656D11B3]\n' +
+    '\tGetHandleVerifier [0x00007FF765BBD74D+3223469]\n' +
+    '\tGetHandleVerifier [0x00007FF765BB7CF2+3200338]\n' +
+    '\tGetHandleVerifier [0x00007FF765BD5B23+3322755]\n' +
+    '\tGetHandleVerifier [0x00007FF7658D6A3A+180890]\n' +
+    '\tGetHandleVerifier [0x00007FF7658DE13F+211359]\n' +
+    '\tGetHandleVerifier [0x00007FF7658C52B4+109332]\n' +
+    '\tGetHandleVerifier [0x00007FF7658C5462+109762]\n' +
+    '\tGetHandleVerifier [0x00007FF7658ABA79+4825]\n' +
+    '\tBaseThreadInitThunk [0x00007FFD8949E8D7+23]\n' +
+    '\tRtlUserThreadStart [0x00007FFD8A17C5DC+44]\n',
+  text_: undefined
+}
+
+
