@@ -1,13 +1,13 @@
-# Gate-Pass
+# GatePass
 
-Gate-Pass is a full-stack institutional leave management system built for Thapar Institute of Engineering and Technology. It replaces the entire paper-based student leave process with a structured 3-tier digital workflow — a student submits a leave request, their parent verifies it through a secure email link, an admin approves or rejects it, and the student gets a QR code to present at the gate. The security guard scans it and the exit is logged. No paperwork, no manual entries, no chasing approvals over WhatsApp.
+GatePass is a full-stack institutional leave management system built for Thapar Institute of Engineering and Technology. It replaces the entire paper-based student leave process with a structured 3-tier digital workflow: a student submits a leave request, their parent verifies it through a secure email link, an admin approves or rejects it, and the student gets a QR code to present at the gate. The security guard scans it and the exit is logged. No paperwork, no manual entries, no chasing approvals over WhatsApp.
 
 
 
 ## 🛠️ Technologies
 
 - React (Frontend)
-- TypeScript
+- JavaScript
 - Node.js + Express (Backend)
 - Prisma (ORM)
 - PostgreSQL
@@ -88,12 +88,3 @@ cd ../frontend
 npm install
 npm run dev  # runs on http://localhost:5173
 ```
-
-<!--
----
-## 🎥 Video
--->
-
-
-
-<!-- Attach your demo video here -->

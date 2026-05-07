@@ -14,8 +14,8 @@ import {addHours} from "date-fns";
 const transporter = nodemailer.createTransport({
     service:"gmail", 
     auth: {
-        user: process.env.email,
-        pass: process.env.password,
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD,
     },
     });
 const generateToken = (length = 5): string => {

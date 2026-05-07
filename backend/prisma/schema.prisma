@@ -9,37 +9,36 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URI")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-model User{
-  id String @id @map("_id") @default(auto()) @db.ObjectId
-  name String
-  email String @unique
-  parentEmail String
-  password String
-  rollno String
-  hostelName String
-  parentAuth Boolean @default(false)
-  adminAuth Boolean  @default(false)
-  parentAuthToken String?
+model User {
+  id                 String    @id @default(cuid())
+  name               String
+  email              String    @unique
+  parentEmail        String
+  password           String
+  rollno             String
+  hostelName         String
+  parentAuth         Boolean   @default(false)
+  adminAuth          Boolean   @default(false)
+  parentAuthToken    String?
   parentAuthExpireAt DateTime?
 }
 
-model Admin{
-  id String @id @map("_id") @default(auto()) @db.ObjectId
-  name String
-  email String @unique
-  password String
+model Admin {
+  id         String @id @default(cuid())
+  name       String
+  email      String @unique
+  password   String
   hostelName String
 }
 
-model Guard{
-  id String @id @map("_id") @default(auto()) @db.ObjectId
-  name String
-  email String @unique
+model Guard {
+  id       String @id @default(cuid())
+  name     String
+  email    String @unique
   password String
 }
-
-

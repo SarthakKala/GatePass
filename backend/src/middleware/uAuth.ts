@@ -2,11 +2,11 @@ import express,{Response,Request,NextFunction} from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config";
 interface PayLoad{
-    id : number
+    id : string
 }
 declare module "express-serve-static-core" {
     interface Request {
-      userId?: number;
+      userId?: string;
     }
   }
 

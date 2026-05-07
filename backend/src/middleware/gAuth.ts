@@ -1,11 +1,11 @@
 import express,{Response,Request,NextFunction} from "express";
 import jwt from "jsonwebtoken";
 interface PayLoad{
-    id : number
+    id : string
 }
 declare module "express-serve-static-core" {
     interface Request {
-      guardId?: number;
+      guardId?: string;
     }
   }
 
