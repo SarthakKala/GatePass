@@ -1,16 +1,18 @@
 import express, {Request, Response} from "express";
 const router = express.Router();
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { signupVal } from "../lib/validators/userValidator";
 import { signinVal } from "../lib/validators/userValidator";
-import { userMail } from "../lib/validators/userValidator";
-import {JWT_SECRET} from "../config";
+import { pushSubscriptionVal, tokenQueryVal, userMail } from "../lib/validators/userValidator";
+import {FRONTEND_URL, JWT_SECRET} from "../config";
 import uAuth from "../middleware/uAuth"
-import { any } from "zod";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 import {addHours} from "date-fns";
+import { prisma } from "../db";
+import { validate } from "../middleware/validate";
+import { PushSubscription, sendPushNotification } from "../utils/webPush";
 const transporter = nodemailer.createTransport({
     service:"gmail", 
     auth: {
@@ -18,15 +20,14 @@ const transporter = nodemailer.createTransport({
         pass: process.env.PASSWORD,
     },
     });
-const generateToken = (length = 5): string => {
-    return crypto.randomBytes(length).toString('hex'); // returns a hexadecimal token
-  };
-const prisma = new PrismaClient();
 router.get("/me",uAuth,async(req:Request,res:Response):Promise<any>=>{
     const userId = req.userId;
+    if(!userId){
+        return res.status(401).json({msg:"Unauthorized"});
+    }
     const user = await prisma.user.findFirst({
         where:{
-            id: userId ? String(userId) : undefined
+            id: userId
         },
         select:{
             id:true,
@@ -39,12 +40,8 @@ router.get("/me",uAuth,async(req:Request,res:Response):Promise<any>=>{
     })
     return res.json({id:user?.id,name:user?.name,rollno:user?.rollno,parentAuth:user?.parentAuth,adminAuth:user?.adminAuth,parentAuthToken:user?.parentAuthToken})
 })
-router.post("/signup",async(req:Request,res:Response):Promise<any>=>{
+router.post("/signup",validate(signupVal),async(req:Request,res:Response):Promise<any>=>{
     const userBody = req.body;
-    const success = signupVal.safeParse(userBody);
-    if(!success.success){
-        return res.status(403).json({"msg":"Wrong format"});
-    }
     try{
         const user  = await prisma.user.create({
             data:userBody}
@@ -53,17 +50,12 @@ router.post("/signup",async(req:Request,res:Response):Promise<any>=>{
         res.status(200).json({token:token});
     
     }catch(e){
-        return res.status(403).json({e:e});
-        console.log(e);
+        return res.status(409).json({msg:"User already exists"});
     }
     
 })
-router.post("/signin",async(req:Request,res:Response):Promise<any>=>{
+router.post("/signin",validate(signinVal),async(req:Request,res:Response):Promise<any>=>{
     const signinBody = req.body;
-    const success = signinVal.safeParse(signinBody);
-    if(!success.success){
-        return res.status(403).json({msg:"Invalid Input"})
-    }
     try{
         const user = await prisma.user.findFirst({
             where:{
@@ -77,34 +69,34 @@ router.post("/signin",async(req:Request,res:Response):Promise<any>=>{
         const token = jwt.sign({id:user.id},JWT_SECRET);
         res.status(200).json({msg:"Signin Success",token:token});
     }catch(e){
-        
+        return res.status(500).json({msg:"An error occurred"});
     }
 })
 router.post(
     "/send",
     uAuth,
+    validate(userMail),
     async (req: Request, res: Response): Promise<any> => {
-      const body = req.body;
-      console.log(body);
-      const check = userMail.safeParse(body);
-      console.log(check);
-      if (!check.success) {
-        return res.status(400).json({ error: "Invalid input" });
+      if(!req.userId){
+        return res.status(401).json({msg:"Unauthorized"});
       }
+      const body = req.body;
       const parentEmail = await prisma.user.update({
         where: {
-          id: req.userId ? String(req.userId) : undefined,
+          id: req.userId,
         },
         data: {
-          parentAuthToken: crypto.randomBytes(3).toString("hex"),
+          parentAuthToken: crypto.randomBytes(32).toString("hex"),
           parentAuthExpireAt: addHours(new Date(), 3),
+          parentAuth: false,
+          adminAuth: false,
         },
         select: {
           parentAuthToken: true,
           parentEmail: true,
         },
       });
-      const link = `http://localhost:5173/auth?token=${parentEmail?.parentAuthToken}`;
+      const link = `${FRONTEND_URL}/auth?token=${parentEmail.parentAuthToken}`;
       try {
         await transporter.sendMail({
           from: process.env.EMAIL,
@@ -148,34 +140,73 @@ router.post(
     }
   );
 
-router.put("/auth",async(req:Request,res:Response):Promise<any>=>{
+router.put("/auth",validate(tokenQueryVal, "query"),async(req:Request,res:Response):Promise<any>=>{
     const token : string = (req.query as { token: string }).token;
-    console.log(token);
     try{
-    const user = await prisma.user.findFirst({
-        where:{
-            parentAuthToken:token
-        }
-    })
+    const updatedUser = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.findFirst({
+            where:{
+                parentAuthToken:token
+            }
+        })
 
-    if(!user || !user.parentAuthExpireAt || user.parentAuthExpireAt < new Date()){
-        return res.status(400).json({msg:"Invalid"});
-    }
-    const updatedUser = await prisma.user.update({
-        where:{
-            id:user.id
-        },
-        data:{
-            parentAuthToken:null,
-            parentAuthExpireAt:null,
-            parentAuth:true
+        if(!user || !user.parentAuthExpireAt || user.parentAuthExpireAt < new Date()){
+            throw new Error("Invalid token");
         }
-    })
+
+        const updateResult = await tx.user.updateMany({
+            where:{
+                id:user.id,
+                parentAuthToken:token
+            },
+            data:{
+                parentAuthToken:null,
+                parentAuthExpireAt:null,
+                parentAuth:true
+            }
+        })
+
+        if(updateResult.count !== 1){
+            throw new Error("Token already used");
+        }
+
+        return tx.user.findUnique({
+            where:{ id:user.id },
+            select:{ id:true, pushSubscription:true },
+        });
+    });
+
+    if(updatedUser?.pushSubscription){
+        const result = await sendPushNotification(updatedUser.pushSubscription as unknown as PushSubscription, {
+            title: "Parent Verification Done",
+            body: "Your parent has verified your leave request. Awaiting admin approval.",
+        });
+        if(result?.expired){
+            await prisma.user.update({
+                where:{ id: updatedUser.id },
+                data:{ pushSubscription: Prisma.DbNull },
+            });
+        }
+    }
+
     return res.status(200).json({msg:"Successfull"});
     }
     catch(e){
-        return res.status(400).json({msg:"An error occured"})
+        return res.status(400).json({msg:"Invalid or expired token"})
     }
+})
+
+router.post("/push/subscribe",uAuth,validate(pushSubscriptionVal),async(req:Request,res:Response):Promise<any>=>{
+    if(!req.userId){
+        return res.status(401).json({msg:"Unauthorized"});
+    }
+
+    await prisma.user.update({
+        where:{ id:req.userId },
+        data:{ pushSubscription:req.body.subscription as Prisma.InputJsonValue },
+    });
+
+    return res.status(200).json({success:true});
 })
 
 export default router;

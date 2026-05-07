@@ -1,18 +1,15 @@
 import z from "zod";
 export const signupVal = z.object({
-    name: z.string(),
-    email:z.string().email(),
-    password : z.string(),
+    name: z.string().trim().min(2).max(100),
+    email:z.string().trim().email().toLowerCase(),
+    password : z.string().min(6).max(100),
 })
 
 export const signinVal = z.object({
-    email:z.string(),
-    password : z.string()
+    email:z.string().trim().email().toLowerCase(),
+    password : z.string().min(1).max(100)
 })
 
-// model Guard{
-//     id Int @id @default(autoincrement())
-//     name String
-//     email String @unique
-//     password String
-//   }
+export const idQueryVal = z.object({
+    id: z.string().min(1),
+});

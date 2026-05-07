@@ -7,7 +7,7 @@ GatePass is a full-stack institutional leave management system built for Thapar 
 ## 🛠️ Technologies
 
 - React (Frontend)
-- JavaScript
+- TypeScript
 - Node.js + Express (Backend)
 - Prisma (ORM)
 - PostgreSQL

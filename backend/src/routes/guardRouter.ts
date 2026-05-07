@@ -1,10 +1,10 @@
 import express, {Request, Response} from "express";
 const router = express.Router();
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../db";
+import { validate } from "../middleware/validate";
+import { idQueryVal } from "../lib/validators/guardValidator";
 
-const prisma = new PrismaClient();
-
-router.put("/done",async(req:Request,res:Response):Promise<any>=>{
+router.put("/done",validate(idQueryVal, "query"),async(req:Request,res:Response):Promise<any>=>{
     const id = req.query.id;
     try{
     const user = await prisma.user.update({

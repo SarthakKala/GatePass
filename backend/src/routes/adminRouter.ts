@@ -1,18 +1,17 @@
 import express, {Request, Response} from "express";
 const router = express.Router();
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { signupVal } from "../lib/validators/adminValidator";
 import { signinVal } from "../lib/validators/adminValidator";
+import { idQueryVal, paginationQueryVal } from "../lib/validators/adminValidator";
 import aAuth from "../middleware/aAuth";
+import { prisma } from "../db";
+import { validate } from "../middleware/validate";
+import { PushSubscription, sendPushNotification } from "../utils/webPush";
 
-const prisma = new PrismaClient();
-router.post("/signup",async(req:Request,res:Response):Promise<any>=>{
+router.post("/signup",validate(signupVal),async(req:Request,res:Response):Promise<any>=>{
     const adminBody = req.body;
-    const success = signupVal.safeParse(adminBody);
-    if(!success.success){
-        return res.status(403).json({"msg":"Wrong format"});
-    }
     try{
         const admin  = await prisma.admin.create({
             data:adminBody}
@@ -25,12 +24,8 @@ router.post("/signup",async(req:Request,res:Response):Promise<any>=>{
     }
     
 })
-router.post("/signin",async(req:Request,res:Response):Promise<any>=>{
+router.post("/signin",validate(signinVal),async(req:Request,res:Response):Promise<any>=>{
     const signinBody = req.body;
-    const success = signinVal.safeParse(signinBody);
-    if(!success.success){
-        return res.status(403).json({msg:"Invalid Input"})
-    }
     try{
         const admin = await prisma.admin.findFirst({
             where:{
@@ -44,12 +39,19 @@ router.post("/signin",async(req:Request,res:Response):Promise<any>=>{
         const token = jwt.sign({id:admin.id},process.env.JWT_SECRET as string);
         res.status(200).json({msg:"Signin Success",token:token});
     }catch(e){
-        
+        return res.status(500).json({msg:"An error occurred"});
     }
 })
 
-router.get("/getAll",aAuth,async(req:Request,res:Response):Promise<any>=>{
-    const users = await prisma.user.findMany({
+router.get("/getAll",aAuth,validate(paginationQueryVal, "query"),async(req:Request,res:Response):Promise<any>=>{
+    const { page, limit } = req.query as unknown as { page: number; limit: number };
+    const skip = (page - 1) * limit;
+    const where = {
+        parentAuth:true,
+        adminAuth:false
+    };
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
         where:{
             parentAuth:true,
             adminAuth:false
@@ -58,28 +60,54 @@ router.get("/getAll",aAuth,async(req:Request,res:Response):Promise<any>=>{
             id:true,
             name:true,
             email:true
+        },
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+    }),
+      prisma.user.count({ where }),
+    ]);
+
+    return res.status(200).json({
+        users:users,
+        pagination:{
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+            hasNext: page * limit < total,
+            hasPrev: page > 1,
         }
-    })
-    if(!users){
-        return res.status(400).json({msg:"Error occured while fetching admins"});
-    }
-    return res.status(200).json({users:users});
+    });
 })
 
-router.put("/allow",aAuth,async(req:Request,res:Response):Promise<any>=>{
+router.put("/allow",aAuth,validate(idQueryVal, "query"),async(req:Request,res:Response):Promise<any>=>{
     const userId = req.query.id;
-    if(!userId){
-        return res.status(403).json({msg:"Id Invalid or null"})
-    }
     try{
     const allowedusers = await prisma.user.update({
         where:{
-            id: String(userId)  // Convert to string instead of number
+            id: String(userId)
         },
         data:{
             adminAuth:true
-        }
+        },
+        select:{
+            id:true,
+            pushSubscription:true,
+        },
     })
+    if(allowedusers.pushSubscription){
+        const result = await sendPushNotification(allowedusers.pushSubscription as unknown as PushSubscription, {
+            title: "Leave Request Approved",
+            body: "Your leave request has been approved.",
+        });
+        if(result?.expired){
+            await prisma.user.update({
+                where:{ id: allowedusers.id },
+                data:{ pushSubscription: Prisma.DbNull },
+            });
+        }
+    }
     return res.status(200).json({msg:"Successfull"});
 }catch(e){
     return res.status(400).json({msg:"An error occured"});

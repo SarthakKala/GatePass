@@ -24,21 +24,28 @@ model User {
   hostelName         String
   parentAuth         Boolean   @default(false)
   adminAuth          Boolean   @default(false)
-  parentAuthToken    String?
+  parentAuthToken    String?   @unique
   parentAuthExpireAt DateTime?
+  pushSubscription   Json?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 }
 
 model Admin {
-  id         String @id @default(cuid())
+  id         String   @id @default(cuid())
   name       String
-  email      String @unique
+  email      String   @unique
   password   String
   hostelName String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Guard {
-  id       String @id @default(cuid())
-  name     String
-  email    String @unique
-  password String
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
