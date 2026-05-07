@@ -4,6 +4,7 @@ export const signupVal = z.object({
     email:z.string().trim().email().toLowerCase(),
     password : z.string().min(6).max(100),
     hostelName : z.string().trim().min(2).max(100),
+    adminCode: z.string().trim().min(1).max(100),
 })
 
 export const signinVal = z.object({

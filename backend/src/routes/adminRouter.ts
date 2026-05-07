@@ -9,14 +9,21 @@ import aAuth from "../middleware/aAuth";
 import { prisma } from "../db";
 import { validate } from "../middleware/validate";
 import { PushSubscription, sendPushNotification } from "../utils/webPush";
+import { ADMIN_SIGNUP_SECRET, JWT_SECRET } from "../config";
 
 router.post("/signup",validate(signupVal),async(req:Request,res:Response):Promise<any>=>{
-    const adminBody = req.body;
+    const { adminCode, ...adminBody } = req.body;
+    if(!ADMIN_SIGNUP_SECRET){
+        return res.status(500).json({msg:"Admin signup is not configured"});
+    }
+    if(adminCode !== ADMIN_SIGNUP_SECRET){
+        return res.status(403).json({msg:"Invalid admin access code"});
+    }
     try{
         const admin  = await prisma.admin.create({
             data:adminBody}
         );
-        const token = jwt.sign({id:admin.id},process.env.JWT_SECRET as string );
+        const token = jwt.sign({id:admin.id},JWT_SECRET);
         res.status(200).json({token:token});
     
     }catch(e){
@@ -36,7 +43,7 @@ router.post("/signin",validate(signinVal),async(req:Request,res:Response):Promis
         if(!admin){
             return res.status(401).json({msg:"admin does not exist"});
         }
-        const token = jwt.sign({id:admin.id},process.env.JWT_SECRET as string);
+        const token = jwt.sign({id:admin.id},JWT_SECRET);
         res.status(200).json({msg:"Signin Success",token:token});
     }catch(e){
         return res.status(500).json({msg:"An error occurred"});

@@ -81,21 +81,32 @@ router.post(
         return res.status(401).json({msg:"Unauthorized"});
       }
       const body = req.body;
-      const parentEmail = await prisma.user.update({
-        where: {
-          id: req.userId,
-        },
-        data: {
-          parentAuthToken: crypto.randomBytes(32).toString("hex"),
-          parentAuthExpireAt: addHours(new Date(), 3),
-          parentAuth: false,
-          adminAuth: false,
-        },
-        select: {
-          parentAuthToken: true,
-          parentEmail: true,
-        },
-      });
+      let parentEmail;
+      try {
+        parentEmail = await prisma.user.update({
+          where: {
+            id: req.userId,
+          },
+          data: {
+            parentAuthToken: crypto.randomBytes(32).toString("hex"),
+            parentAuthExpireAt: addHours(new Date(), 3),
+            parentAuth: false,
+            adminAuth: false,
+          },
+          select: {
+            parentAuthToken: true,
+            parentEmail: true,
+          },
+        });
+      } catch (e) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2025") {
+          return res.status(404).json({
+            msg: "Student account not found. Please sign in as a student before submitting leave.",
+          });
+        }
+
+        return res.status(500).json({ msg: "Could not create leave request" });
+      }
       const link = `${FRONTEND_URL}/auth?token=${parentEmail.parentAuthToken}`;
       try {
         await transporter.sendMail({
