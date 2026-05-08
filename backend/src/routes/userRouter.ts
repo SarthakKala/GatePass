@@ -2,19 +2,27 @@ import express, {Request, Response} from "express";
 const router = express.Router();
 import jwt from "jsonwebtoken";
 import { Prisma } from "@prisma/client";
-import { Resend } from "resend";
 import { signupVal } from "../lib/validators/userValidator";
 import { signinVal } from "../lib/validators/userValidator";
 import { pushSubscriptionVal, tokenQueryVal, userMail } from "../lib/validators/userValidator";
-import { EMAIL_FROM, FRONTEND_URL, JWT_SECRET, RESEND_API_KEY } from "../config";
+import { EMAIL_FROM, FRONTEND_URL, JWT_SECRET, MAIL_HOST, MAIL_PASS, MAIL_PORT, MAIL_USER } from "../config";
 import uAuth from "../middleware/uAuth"
+import nodemailer from "nodemailer";
 import crypto from "crypto";
 import {addHours} from "date-fns";
 import { prisma } from "../db";
 import { validate } from "../middleware/validate";
 import { PushSubscription, sendPushNotification } from "../utils/webPush";
 
-const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
+const transporter = nodemailer.createTransport({
+    host: MAIL_HOST,
+    port: MAIL_PORT,
+    secure: MAIL_PORT === 465,
+    auth: {
+        user: MAIL_USER,
+        pass: MAIL_PASS,
+    },
+});
 
 router.get("/me",uAuth,async(req:Request,res:Response):Promise<any>=>{
     const userId = req.userId;
@@ -105,11 +113,11 @@ router.post(
       }
       const link = `${FRONTEND_URL}/auth?token=${parentEmail.parentAuthToken}`;
       try {
-        if(!resend){
+        if(!MAIL_HOST || !MAIL_USER || !MAIL_PASS || !EMAIL_FROM){
           return res.status(500).json({ message: "Email service is not configured" });
         }
 
-        const { error } = await resend.emails.send({
+        await transporter.sendMail({
           from: EMAIL_FROM,
           to: parentEmail.parentEmail,
           subject: "Authentication Request",
@@ -145,15 +153,15 @@ router.post(
       `,
         });
 
-        if(error){
-          console.error("Resend email failed:", error);
-          return res.status(400).json({ message: "Mail not sent. Please check Resend configuration." });
-        }
-
         return res.json({ message: "Mail sent" });
       } catch (e: any) {
-        console.error("Mail not sent:", e);
-        return res.status(400).json({ message: "Mail not sent. Please check Resend configuration." });
+        console.error("Mail not sent:", {
+          code: e?.code,
+          command: e?.command,
+          response: e?.response,
+          responseCode: e?.responseCode,
+        });
+        return res.status(400).json({ message: "Mail not sent. Please check Brevo SMTP configuration." });
       }
     }
   );
