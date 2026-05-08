@@ -30,6 +30,7 @@ GatePass is a full-stack institutional leave management system built for hostel 
 - After exit validation, the student page changes from QR to a return pass
 - Students can download the return pass as an image and show it while returning
 - Mobile-first glass UI for student, parent, admin, and guard screens
+- Deployment-ready setup for Vercel frontend, Render backend, and Neon database
 
 
 
@@ -41,7 +42,7 @@ Most hostel leave systems are either manual or only partly digital. Someone stil
 
 ## 🔧 Process
 
-I built the project around one clear flow: student request, parent verification, admin approval, guard scan, and return pass. The parent uses a one-time email link, so no separate parent account is needed.
+I built the project around one clear flow: student request, parent verification, admin approval, guard scan, and return pass. The parent uses a one-time email link sent through Brevo's API, so no separate parent account is needed.
 
 The admin dashboard stays updated automatically and admin signup is protected with `ADMIN_SIGNUP_SECRET`. At the gate, the guard scans the QR, confirms the student details, and marks the exit as done. After that, the student's QR changes into a downloadable return pass.
 
@@ -80,7 +81,7 @@ npm install
 # ADMIN_SIGNUP_SECRET=your_demo_admin_code
 # FRONTEND_URL=http://localhost:5173
 # BREVO_API_KEY=your_brevo_api_key
-# EMAIL_FROM=GatePass <your_verified_sender_email>
+# EMAIL_FROM=GatePass <your_verified_brevo_sender_email>
 # VAPID_PUBLIC_KEY=your_vapid_public_key
 # VAPID_PRIVATE_KEY=your_vapid_private_key
 # VAPID_EMAIL=mailto:your_email@example.com
@@ -112,7 +113,7 @@ Build Command: npm install && npm run build
 Start Command: npm start
 ```
 
-Set the same backend environment variables on Render. For `FRONTEND_URL`, use your Vercel URL. For email, add `BREVO_API_KEY` and `EMAIL_FROM`.
+Set the same backend environment variables on Render. For `FRONTEND_URL`, use your Vercel URL. For email, add `BREVO_API_KEY` and `EMAIL_FROM`. The sender email in `EMAIL_FROM` must be verified in Brevo.
 
 Vercel frontend settings:
 ```bash
@@ -126,3 +127,11 @@ Set these frontend environment variables on Vercel:
 VITE_API_URL=https://your-render-backend.onrender.com
 VITE_FRONTEND_URL=https://your-vercel-app.vercel.app
 ```
+
+Example backend email values:
+```env
+BREVO_API_KEY=your_brevo_api_key
+EMAIL_FROM=GatePass <your_verified_sender_email>
+```
+
+For a quick test, the verified sender can be your own email added in Brevo. For production, a domain-based sender like `noreply@yourdomain.com` is better.
