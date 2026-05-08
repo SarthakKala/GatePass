@@ -5,7 +5,7 @@ import { Prisma } from "@prisma/client";
 import { signupVal } from "../lib/validators/userValidator";
 import { signinVal } from "../lib/validators/userValidator";
 import { pushSubscriptionVal, tokenQueryVal, userMail } from "../lib/validators/userValidator";
-import {FRONTEND_URL, JWT_SECRET} from "../config";
+import { EMAIL, EMAIL_PASSWORD, FRONTEND_URL, JWT_SECRET } from "../config";
 import uAuth from "../middleware/uAuth"
 import nodemailer from "nodemailer";
 import crypto from "crypto";
@@ -16,8 +16,8 @@ import { PushSubscription, sendPushNotification } from "../utils/webPush";
 const transporter = nodemailer.createTransport({
     service:"gmail", 
     auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD,
+        user: EMAIL,
+        pass: EMAIL_PASSWORD,
     },
     });
 router.get("/me",uAuth,async(req:Request,res:Response):Promise<any>=>{
@@ -109,8 +109,12 @@ router.post(
       }
       const link = `${FRONTEND_URL}/auth?token=${parentEmail.parentAuthToken}`;
       try {
+        if(!EMAIL || !EMAIL_PASSWORD){
+          return res.status(500).json({ message: "Email service is not configured" });
+        }
+
         await transporter.sendMail({
-          from: process.env.EMAIL,
+          from: EMAIL,
           to: parentEmail?.parentEmail,
           subject: "Authentication Request",
           html: `
@@ -145,8 +149,14 @@ router.post(
       `,
         });
         return res.json({ message: "Mail sent" });
-      } catch (e) {
-        return res.status(400).json({ error: e, message: "Mail not sent" });
+      } catch (e: any) {
+        console.error("Mail not sent:", {
+          code: e?.code,
+          command: e?.command,
+          response: e?.response,
+          responseCode: e?.responseCode,
+        });
+        return res.status(400).json({ message: "Mail not sent. Please check backend email configuration." });
       }
     }
   );
