@@ -1,6 +1,6 @@
 # GatePass
 
-GatePass is a full-stack institutional leave management system built for Thapar Institute of Engineering and Technology. It replaces the entire paper-based student leave process with a structured 3-tier digital workflow: a student submits a leave request, their parent verifies it through a secure email link, an admin approves or rejects it, and the student gets a QR code to present at the gate. The security guard scans it and the exit is logged. No paperwork, no manual entries, no chasing approvals over WhatsApp.
+GatePass is a full-stack institutional leave management system built for hostel and campus exit workflows. It replaces the paper-based process with a simple digital loop: a student submits a leave request, the parent verifies it through email, the admin approves it, and the student gets a QR gate pass. The guard scans the QR at the exit, confirms the student details, and the student then gets a return pass that can be downloaded and shown while coming back.
 
 
 
@@ -10,56 +10,57 @@ GatePass is a full-stack institutional leave management system built for Thapar 
 - TypeScript
 - Node.js + Express (Backend)
 - Prisma (ORM)
-- PostgreSQL
+- PostgreSQL with Neon
 - JWT (Authentication)
 - Nodemailer + Gmail SMTP (Email verification)
-- QR Code Library
+- Zod validation and rate limiting
+- Web Push support
+- QR Code + downloadable return pass
 
 
 
 ## ✨ Features
 
-- Students submit leave requests with destination, dates, and reason — all in one form
-- Parents receive a secure one-time email verification link that expires after use — no account needed
-- Admin dashboard shows all pending requests that have cleared parental verification, ready for review
-- Admins approve or reject requests with a single action — approved requests auto-generate a QR code
-- Security guard scans the QR code at the gate — system logs the exit automatically
-- 3-role JWT authentication — student, admin, and security guard each see only what they need
-- Full audit trail of every request, approval, rejection, and gate scan stored in PostgreSQL
+- Students submit leave requests with destination, dates, and reason in one form
+- Parents receive a secure one-time email verification link. No parent account is needed
+- Admin signup is protected with an access code from the backend `.env`
+- Admin dashboard auto-refreshes, so new parent-approved requests appear without a manual refresh
+- Approved students get a QR code for the exit gate
+- Guards scan the QR, see verified student details, and mark the exit as done
+- After exit validation, the student page changes from QR to a return pass
+- Students can download the return pass as an image and show it while returning
+- Mobile-first glass UI for student, parent, admin, and guard screens
 
 
 
 ## 🔐 Three Roles, One System, Zero Manual Logging
 
-Most hostel leave systems at colleges are either fully manual or half-digitized — someone still has to call the parent, someone still has to write in a register. Gate-Pass closes the entire loop digitally. The parent never needs an account. The security guard never needs to write anything down. Every approval and exit is in the database automatically.
+Most hostel leave systems are either manual or only partly digital. Someone still has to call the parent, refresh a page, or write in a register. GatePass keeps the flow simple for everyone. The student requests leave, the parent approves from an email link, the admin approves from a live dashboard, and the guard validates the QR at the gate.
 
 
 
 ## 🔧 Process
 
-The project started from a real problem — the existing leave process at Thapar involved physical forms, manual parent calls, and handwritten gate registers. We mapped out all three user roles first (student, admin, guard) and designed the database schema and API routes before writing any frontend code.
+I built the project around one clear flow: student request, parent verification, admin approval, guard scan, and return pass. The parent uses a one-time email link, so no separate parent account is needed.
 
-The authentication system was the most critical piece. Rather than building a separate parent portal, I used a token-based email flow — when a student submits a request, the backend generates a signed JWT with an expiry, embeds it in a verification URL, and sends it to the parent's registered email via Nodemailer. The parent clicks the link, the token is validated, and the request moves to the admin queue. No parent account, no friction.
-
-The admin dashboard pulls all requests that have cleared parental verification and lets admins approve or reject with a single API call. On approval, the backend generates a QR code tied to the request ID and stores it against the student's record.
-
-The security guard interface is intentionally minimal — scan the QR, see the student's name, leave dates, and approval status, and the exit gets logged. Built it this way because the guards shouldn't need to navigate a complex UI.
+The admin dashboard stays updated automatically and admin signup is protected with `ADMIN_SIGNUP_SECRET`. At the gate, the guard scans the QR, confirms the student details, and marks the exit as done. After that, the student's QR changes into a downloadable return pass.
 
 
 
 ## 📚 What I Learned
 
-- **JWT-based multi-role auth** — designing a single auth system that serves three completely different user roles with different permissions and different views, all using the same token infrastructure
-- **One-time token email flows** — generating expiry-based signed tokens, embedding them in URLs, and validating them on the backend without storing session state
-- **Prisma + PostgreSQL** — modeling a relational schema with multiple roles, request states, and audit records; writing efficient queries for the admin dashboard
-- **Nodemailer** — setting up Gmail SMTP for transactional emails and handling delivery edge cases
-- **Role-based UI design** — building three entirely different interfaces (student, admin, guard) that share the same backend but show completely different things based on the JWT role claim
+- **Multi-role auth**: handling student, admin, and guard flows without mixing their screens or permissions
+- **One-time email links**: sending parent verification links that expire and cannot be reused
+- **Prisma + Neon PostgreSQL**: moving from local thinking to a hosted relational database setup
+- **Safer APIs**: adding validation, rate limits, pagination, shared Prisma client, and clearer error messages
+- **Live UI flows**: auto-updating the admin dashboard and student status screens without refreshes
+- **Mobile-first UI**: making the app usable on phones since that is where students and guards will mostly use it
 
 
 
 ## 🌱 Overall Growth
 
-Gate-Pass was the first project where I had to think seriously about a real user flow with multiple distinct actors. It's not just one user doing one thing — it's three different people interacting with the same system in sequence, and the system has to stay consistent throughout that chain. Designing that correctly, especially the email verification flow, taught me more about auth and system design than any tutorial.
+GatePass helped me think beyond simple CRUD screens. The main challenge was keeping one continuous flow consistent across different people: student, parent, admin, and guard. Each person only sees a small part of the system, but the backend has to keep the full chain reliable. Building that loop taught me a lot about auth, validation, database state, and practical UI design.
 
 
 
@@ -73,10 +74,16 @@ cd backend
 npm install
 
 # Create a .env file:
+# DATABASE_URL=your_neon_pooled_connection_string
+# DIRECT_URL=your_neon_direct_connection_string
 # JWT_SECRET=your_secret_key
+# ADMIN_SIGNUP_SECRET=your_demo_admin_code
+# FRONTEND_URL=http://localhost:5173
 # EMAIL=your_gmail_address
 # PASSWORD=your_gmail_app_password
-# DATABASE_URL=your_postgresql_connection_string
+# VAPID_PUBLIC_KEY=your_vapid_public_key
+# VAPID_PRIVATE_KEY=your_vapid_private_key
+# VAPID_EMAIL=mailto:your_email@example.com
 
 npx prisma generate
 npx prisma migrate deploy
