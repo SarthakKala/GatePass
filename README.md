@@ -12,7 +12,7 @@ GatePass is a full-stack institutional leave management system built for hostel 
 - Prisma (ORM)
 - PostgreSQL with Neon
 - JWT (Authentication)
-- Nodemailer + Gmail SMTP (Email verification)
+- Resend (Email verification)
 - Zod validation and rate limiting
 - Web Push support
 - QR Code + downloadable return pass
@@ -79,8 +79,8 @@ npm install
 # JWT_SECRET=your_secret_key
 # ADMIN_SIGNUP_SECRET=your_demo_admin_code
 # FRONTEND_URL=http://localhost:5173
-# EMAIL=your_gmail_address
-# PASSWORD=your_gmail_app_password
+# RESEND_API_KEY=your_resend_api_key
+# EMAIL_FROM=GatePass <onboarding@resend.dev>
 # VAPID_PUBLIC_KEY=your_vapid_public_key
 # VAPID_PRIVATE_KEY=your_vapid_private_key
 # VAPID_EMAIL=mailto:your_email@example.com
@@ -112,7 +112,7 @@ Build Command: npm install && npm run build
 Start Command: npm start
 ```
 
-Set the same backend environment variables on Render. For `FRONTEND_URL`, use your Vercel URL.
+Set the same backend environment variables on Render. For `FRONTEND_URL`, use your Vercel URL. For email, add `RESEND_API_KEY` and `EMAIL_FROM`.
 
 Vercel frontend settings:
 ```bash

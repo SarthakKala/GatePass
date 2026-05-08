@@ -2,24 +2,20 @@ import express, {Request, Response} from "express";
 const router = express.Router();
 import jwt from "jsonwebtoken";
 import { Prisma } from "@prisma/client";
+import { Resend } from "resend";
 import { signupVal } from "../lib/validators/userValidator";
 import { signinVal } from "../lib/validators/userValidator";
 import { pushSubscriptionVal, tokenQueryVal, userMail } from "../lib/validators/userValidator";
-import { EMAIL, EMAIL_PASSWORD, FRONTEND_URL, JWT_SECRET } from "../config";
+import { EMAIL_FROM, FRONTEND_URL, JWT_SECRET, RESEND_API_KEY } from "../config";
 import uAuth from "../middleware/uAuth"
-import nodemailer from "nodemailer";
 import crypto from "crypto";
 import {addHours} from "date-fns";
 import { prisma } from "../db";
 import { validate } from "../middleware/validate";
 import { PushSubscription, sendPushNotification } from "../utils/webPush";
-const transporter = nodemailer.createTransport({
-    service:"gmail", 
-    auth: {
-        user: EMAIL,
-        pass: EMAIL_PASSWORD,
-    },
-    });
+
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
+
 router.get("/me",uAuth,async(req:Request,res:Response):Promise<any>=>{
     const userId = req.userId;
     if(!userId){
@@ -109,13 +105,13 @@ router.post(
       }
       const link = `${FRONTEND_URL}/auth?token=${parentEmail.parentAuthToken}`;
       try {
-        if(!EMAIL || !EMAIL_PASSWORD){
+        if(!resend){
           return res.status(500).json({ message: "Email service is not configured" });
         }
 
-        await transporter.sendMail({
-          from: EMAIL,
-          to: parentEmail?.parentEmail,
+        const { error } = await resend.emails.send({
+          from: EMAIL_FROM,
+          to: parentEmail.parentEmail,
           subject: "Authentication Request",
           html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; padding: 20px; background-color: #f9f9f9;">
@@ -148,15 +144,16 @@ router.post(
         </div>
       `,
         });
+
+        if(error){
+          console.error("Resend email failed:", error);
+          return res.status(400).json({ message: "Mail not sent. Please check Resend configuration." });
+        }
+
         return res.json({ message: "Mail sent" });
       } catch (e: any) {
-        console.error("Mail not sent:", {
-          code: e?.code,
-          command: e?.command,
-          response: e?.response,
-          responseCode: e?.responseCode,
-        });
-        return res.status(400).json({ message: "Mail not sent. Please check backend email configuration." });
+        console.error("Mail not sent:", e);
+        return res.status(400).json({ message: "Mail not sent. Please check Resend configuration." });
       }
     }
   );
