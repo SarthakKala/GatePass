@@ -12,7 +12,7 @@ GatePass is a full-stack institutional leave management system built for hostel 
 - Prisma (ORM)
 - PostgreSQL with Neon
 - JWT (Authentication)
-- Brevo SMTP (Email verification)
+- Brevo API (Email verification)
 - Zod validation and rate limiting
 - Web Push support
 - QR Code + downloadable return pass
@@ -79,10 +79,7 @@ npm install
 # JWT_SECRET=your_secret_key
 # ADMIN_SIGNUP_SECRET=your_demo_admin_code
 # FRONTEND_URL=http://localhost:5173
-# MAIL_HOST=smtp-relay.brevo.com
-# MAIL_PORT=587
-# MAIL_USER=your_brevo_smtp_login
-# MAIL_PASS=your_brevo_smtp_key
+# BREVO_API_KEY=your_brevo_api_key
 # EMAIL_FROM=GatePass <your_verified_sender_email>
 # VAPID_PUBLIC_KEY=your_vapid_public_key
 # VAPID_PRIVATE_KEY=your_vapid_private_key
@@ -115,7 +112,7 @@ Build Command: npm install && npm run build
 Start Command: npm start
 ```
 
-Set the same backend environment variables on Render. For `FRONTEND_URL`, use your Vercel URL. For email, add the Brevo SMTP values: `MAIL_HOST`, `MAIL_PORT`, `MAIL_USER`, `MAIL_PASS`, and `EMAIL_FROM`.
+Set the same backend environment variables on Render. For `FRONTEND_URL`, use your Vercel URL. For email, add `BREVO_API_KEY` and `EMAIL_FROM`.
 
 Vercel frontend settings:
 ```bash

@@ -5,24 +5,25 @@ import { Prisma } from "@prisma/client";
 import { signupVal } from "../lib/validators/userValidator";
 import { signinVal } from "../lib/validators/userValidator";
 import { pushSubscriptionVal, tokenQueryVal, userMail } from "../lib/validators/userValidator";
-import { EMAIL_FROM, FRONTEND_URL, JWT_SECRET, MAIL_HOST, MAIL_PASS, MAIL_PORT, MAIL_USER } from "../config";
+import { BREVO_API_KEY, EMAIL_FROM, FRONTEND_URL, JWT_SECRET } from "../config";
 import uAuth from "../middleware/uAuth"
-import nodemailer from "nodemailer";
 import crypto from "crypto";
 import {addHours} from "date-fns";
 import { prisma } from "../db";
 import { validate } from "../middleware/validate";
 import { PushSubscription, sendPushNotification } from "../utils/webPush";
 
-const transporter = nodemailer.createTransport({
-    host: MAIL_HOST,
-    port: MAIL_PORT,
-    secure: MAIL_PORT === 465,
-    auth: {
-        user: MAIL_USER,
-        pass: MAIL_PASS,
-    },
-});
+const parseEmailFrom = (value: string) => {
+  const match = value.match(/^(.*?)\s*<(.+)>$/);
+  if (!match) {
+    return { name: "GatePass", email: value };
+  }
+
+  return {
+    name: match[1].trim() || "GatePass",
+    email: match[2].trim(),
+  };
+};
 
 router.get("/me",uAuth,async(req:Request,res:Response):Promise<any>=>{
     const userId = req.userId;
@@ -113,15 +114,12 @@ router.post(
       }
       const link = `${FRONTEND_URL}/auth?token=${parentEmail.parentAuthToken}`;
       try {
-        if(!MAIL_HOST || !MAIL_USER || !MAIL_PASS || !EMAIL_FROM){
+        if(!BREVO_API_KEY || !EMAIL_FROM){
           return res.status(500).json({ message: "Email service is not configured" });
         }
 
-        await transporter.sendMail({
-          from: EMAIL_FROM,
-          to: parentEmail.parentEmail,
-          subject: "Authentication Request",
-          html: `
+        const sender = parseEmailFrom(EMAIL_FROM);
+        const htmlContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; padding: 20px; background-color: #f9f9f9;">
           <h2 style="text-align: center; color: #333;">Leave Authentication Request</h2>
           <p style="font-size: 16px; color: #555;">Your ward has requested leave authentication. Here are the details:</p>
@@ -150,18 +148,36 @@ router.post(
           </div>
           <p style="font-size: 14px; color: #888; text-align: center; margin-top: 20px;">If you did not request this, please ignore this email.</p>
         </div>
-      `,
+      `;
+
+        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+          method: "POST",
+          headers: {
+            accept: "application/json",
+            "api-key": BREVO_API_KEY,
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            sender,
+            to: [{ email: parentEmail.parentEmail }],
+            subject: "Authentication Request",
+            htmlContent,
+          }),
         });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Brevo API email failed:", {
+            status: response.status,
+            body: errorText,
+          });
+          return res.status(400).json({ message: "Mail not sent. Please check Brevo API configuration." });
+        }
 
         return res.json({ message: "Mail sent" });
       } catch (e: any) {
-        console.error("Mail not sent:", {
-          code: e?.code,
-          command: e?.command,
-          response: e?.response,
-          responseCode: e?.responseCode,
-        });
-        return res.status(400).json({ message: "Mail not sent. Please check Brevo SMTP configuration." });
+        console.error("Mail not sent:", e);
+        return res.status(400).json({ message: "Mail not sent. Please check Brevo API configuration." });
       }
     }
   );
