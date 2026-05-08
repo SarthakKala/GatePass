@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CheckCircle, LogOut } from "lucide-react";
+import { API_URL } from "../lib/config";
 
 export default function Scan() {
   const [searchParams] = useSearchParams();
@@ -17,7 +18,7 @@ export default function Scan() {
   async function allDone() {
     setLoading(true);
     try {
-      await axios.put(`http://localhost:3000/api/guard/done?id=${id}`);
+      await axios.put(`${API_URL}/api/guard/done?id=${id}`);
       setExitTime(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
       setExitDone(true);
     } catch (e) {
@@ -29,7 +30,7 @@ export default function Scan() {
 
   async function getDetail() {
     try {
-      const res = await axios.get(`http://localhost:3000/api/guard/scan?id=${id}`);
+      const res = await axios.get(`${API_URL}/api/guard/scan?id=${id}`);
       setName(res.data.name);
       setRollNo(res.data.rollno);
     } catch (e) {

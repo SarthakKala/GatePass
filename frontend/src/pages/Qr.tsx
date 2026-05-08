@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { CheckCircle, Download, Home } from "lucide-react";
+import { API_URL, FRONTEND_URL } from "../lib/config";
 
 interface LeaveDetails {
   from: string;
@@ -29,7 +30,7 @@ function QrCode() {
   const token = localStorage.getItem("token");
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const qrValue = `http://localhost:5173/scan?id=${id}`;
+  const qrValue = `${FRONTEND_URL}/scan?id=${id}`;
 
   const [exitDone, setExitDone] = useState(false);
   const [studentName, setStudentName] = useState("");
@@ -40,7 +41,7 @@ function QrCode() {
   useEffect(() => {
     const checkExitStatus = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/user/me", {
+        const res = await axios.get(`${API_URL}/api/user/me`, {
           headers: { Authorization: token },
         });
         const { name, rollno, parentAuth, adminAuth } = res.data;

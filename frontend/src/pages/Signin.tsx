@@ -5,6 +5,7 @@ import Button from "../components/Button";
 import axios from "axios";
 import frontImage from "../Images/frontImage.png";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../lib/config";
 
 function Signin() {
   const [email, setEmail] = useState("");
@@ -13,7 +14,7 @@ function Signin() {
 
   async function handleSignin() {
     try {
-      const res = await axios.post("http://localhost:3000/api/user/signin", {
+      const res = await axios.post(`${API_URL}/api/user/signin`, {
         email,
         password,
       });

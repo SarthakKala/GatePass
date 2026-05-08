@@ -3,6 +3,7 @@ import Inputbox from "../components/InputBox";
 import axios from "axios";
 import frontImage from "../Images/frontImage.png";
 import { useNavigate, Link } from "react-router-dom";
+import { API_URL } from "../lib/config";
 
 function AdminSignin() {
   const [email, setEmail] = useState("");
@@ -11,7 +12,7 @@ function AdminSignin() {
 
   async function handleSignin() {
     try {
-      const res = await axios.post("http://localhost:3000/api/admin/signin", {
+      const res = await axios.post(`${API_URL}/api/admin/signin`, {
         email,
         password,
       });

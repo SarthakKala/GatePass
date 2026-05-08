@@ -1,13 +1,16 @@
 import express from "express";
 import cors from "cors";
-const router = express.Router();
 const app = express();
 app.use(express.json());
-app.use(cors());
 import adminRouter from "./routes/adminRouter";
 import userRouter from "./routes/userRouter";
 import guardRouter from "./routes/guardRouter";
 import { authLimiter, emailLimiter, generalLimiter } from "./middleware/rateLimiter";
+import { FRONTEND_URL } from "./config";
+
+app.use(cors({
+    origin: FRONTEND_URL,
+}));
 
 app.set("trust proxy", 1);
 app.use(generalLimiter);
@@ -17,6 +20,8 @@ app.use("/api/admin",adminRouter);
 app.use("/api/user",userRouter);
 app.use("/api/guard",guardRouter);
 
-app.listen("3000",()=>{
-    console.log("The server is running on 3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT,()=>{
+    console.log(`The server is running on ${PORT}`);
 })

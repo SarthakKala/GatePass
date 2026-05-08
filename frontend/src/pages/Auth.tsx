@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CheckCircle, Loader2, ShieldCheck } from "lucide-react";
+import { API_URL } from "../lib/config";
 
 export default function Auth() {
   const [searchParams] = useSearchParams();
@@ -12,7 +13,7 @@ export default function Auth() {
   async function handleAuth() {
     setLoading(true);
     try {
-      await axios.put(`http://localhost:3000/api/user/auth?token=${token}`);
+      await axios.put(`${API_URL}/api/user/auth?token=${token}`);
       setAuthorized(true);
     } catch (e) {
       const message = axios.isAxiosError(e)

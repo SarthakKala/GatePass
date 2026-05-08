@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { API_URL } from "../lib/config";
 
 function Admindash() {
   const [users, setUsers] = useState<{ id: string; name: string; email: string }[]>([]);
@@ -8,7 +9,7 @@ function Admindash() {
 
   async function fetchUsers() {
     try {
-      const res = await axios.get("http://localhost:3000/api/admin/getAll", {
+      const res = await axios.get(`${API_URL}/api/admin/getAll`, {
         headers: {
           authorization: localStorage.getItem("token"),
         },
@@ -32,7 +33,7 @@ function Admindash() {
   async function allowUser(id: string) {
     try {
       await axios.put(
-        `http://localhost:3000/api/admin/allow?id=${id}`,
+        `${API_URL}/api/admin/allow?id=${id}`,
         {},
         {
           headers: {

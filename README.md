@@ -93,5 +93,36 @@ npm run dev  # runs on http://localhost:3000
 # Frontend (separate terminal)
 cd ../frontend
 npm install
+
+# Create a .env file:
+# VITE_API_URL=http://localhost:3000
+# VITE_FRONTEND_URL=http://localhost:5173
+
 npm run dev  # runs on http://localhost:5173
+```
+
+## 🌍 Deployment
+
+For hosting, use Render for the backend, Vercel for the frontend, and Neon for PostgreSQL.
+
+Render backend settings:
+```bash
+Root Directory: backend
+Build Command: npm install && npm run build
+Start Command: npm start
+```
+
+Set the same backend environment variables on Render. For `FRONTEND_URL`, use your Vercel URL.
+
+Vercel frontend settings:
+```bash
+Root Directory: frontend
+Build Command: npm run build
+Output Directory: dist
+```
+
+Set these frontend environment variables on Vercel:
+```env
+VITE_API_URL=https://your-render-backend.onrender.com
+VITE_FRONTEND_URL=https://your-vercel-app.vercel.app
 ```

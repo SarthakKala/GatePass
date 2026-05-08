@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import axios from "axios";
 import frontImage from "../Images/frontImage.png";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../lib/config";
 
 function LeaveApplication() {
   const [fromDate, setFromDate] = useState("");
@@ -15,7 +16,7 @@ function LeaveApplication() {
   async function handleLeaveApplication() {
     try {
       await axios.post(
-        "http://localhost:3000/api/user/send",
+        `${API_URL}/api/user/send`,
         {
           from: fromDate,
           to: toDate,

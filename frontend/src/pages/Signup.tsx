@@ -5,6 +5,7 @@ import Button from "../components/Button";
 import axios from "axios";
 import frontImage from "../Images/frontImage.png";
 import { Link, useNavigate } from "react-router-dom";
+import { API_URL } from "../lib/config";
 
 function Signup() {
   const [name, setName] = useState("");
@@ -17,7 +18,7 @@ function Signup() {
 
   async function handleSignUp() {
     try {
-      const res = await axios.post("http://localhost:3000/api/user/signup", {
+      const res = await axios.post(`${API_URL}/api/user/signup`, {
         name,
         email,
         password,

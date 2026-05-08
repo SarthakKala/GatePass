@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../lib/config";
 
 export default function Waiting() {
   const [parent, setParent] = useState<boolean>(false);
@@ -12,7 +13,7 @@ export default function Waiting() {
 
   async function checkUpdates() {
     try {
-      const res = await axios.get("http://localhost:3000/api/user/me", {
+      const res = await axios.get(`${API_URL}/api/user/me`, {
         headers: {
           authorization: localStorage.getItem("token"),
         },
