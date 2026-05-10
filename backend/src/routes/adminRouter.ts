@@ -36,7 +36,10 @@ router.post("/signin",validate(signinVal),async(req:Request,res:Response):Promis
     try{
         const admin = await prisma.admin.findFirst({
             where:{
-                email:signinBody.email,
+                email:{
+                    equals: signinBody.email,
+                    mode: "insensitive",
+                },
                 password:signinBody.password
             }
         })
