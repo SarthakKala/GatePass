@@ -13,6 +13,15 @@ app.use(cors({
 }));
 
 app.set("trust proxy", 1);
+
+app.get("/health", (_req, res) => {
+    res.status(200).json({
+        status: "ok",
+        service: "gatepass-api",
+        timestamp: new Date().toISOString(),
+    });
+});
+
 app.use(generalLimiter);
 app.use(["/api/user/signup", "/api/user/signin", "/api/admin/signup", "/api/admin/signin"], authLimiter);
 app.use("/api/user/send", emailLimiter);
