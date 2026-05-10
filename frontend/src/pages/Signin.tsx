@@ -4,7 +4,7 @@ import Inputbox from "../components/InputBox";
 import Button from "../components/Button";
 import axios from "axios";
 import frontImage from "../Images/frontImage.png";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { API_URL } from "../lib/config";
 
 function Signin() {
@@ -55,6 +55,21 @@ function Signin() {
           log="Create account"
           link="/signup"
         />
+
+        <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-white/5 border border-white/10 mb-5">
+          <Link
+            to="/signin"
+            className="text-center rounded-xl py-2 text-sm font-semibold text-white bg-indigo-500/25 border border-indigo-400/25"
+          >
+            Student
+          </Link>
+          <Link
+            to="/adminsignin"
+            className="text-center rounded-xl py-2 text-sm font-semibold text-white/45 hover:text-white transition-colors"
+          >
+            Admin
+          </Link>
+        </div>
 
         <div className="space-y-4">
           <Inputbox

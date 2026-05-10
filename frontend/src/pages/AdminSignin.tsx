@@ -62,6 +62,21 @@ function AdminSignin() {
           </p>
         </div>
 
+        <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-white/5 border border-white/10 mb-5">
+          <Link
+            to="/signin"
+            className="text-center rounded-xl py-2 text-sm font-semibold text-white/45 hover:text-white transition-colors"
+          >
+            Student
+          </Link>
+          <Link
+            to="/adminsignin"
+            className="text-center rounded-xl py-2 text-sm font-semibold text-white bg-violet-500/25 border border-violet-400/25"
+          >
+            Admin
+          </Link>
+        </div>
+
         <div className="space-y-4">
           <Inputbox label="Email" type="email" placeholder="admin@example.com" setValue={setEmail} />
           <Inputbox label="Password" type="password" placeholder="••••••••" setValue={setPassword} />

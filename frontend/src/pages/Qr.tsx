@@ -88,62 +88,112 @@ function QrCode() {
       return;
     }
 
-    ctx.fillStyle = "#070710";
+    ctx.fillStyle = "#f3f4fb";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, "#1e1b4b");
-    gradient.addColorStop(0.55, "#111122");
-    gradient.addColorStop(1, "#312e81");
-    ctx.fillStyle = gradient;
-    roundRect(ctx, 70, 70, 760, 1110, 42);
+    const backgroundGlow = ctx.createRadialGradient(140, 80, 40, 140, 80, 620);
+    backgroundGlow.addColorStop(0, "rgba(99, 102, 241, 0.28)");
+    backgroundGlow.addColorStop(1, "rgba(99, 102, 241, 0)");
+    ctx.fillStyle = backgroundGlow;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const secondGlow = ctx.createRadialGradient(820, 1220, 40, 820, 1220, 620);
+    secondGlow.addColorStop(0, "rgba(124, 58, 237, 0.22)");
+    secondGlow.addColorStop(1, "rgba(124, 58, 237, 0)");
+    ctx.fillStyle = secondGlow;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.shadowColor = "rgba(15, 23, 42, 0.22)";
+    ctx.shadowBlur = 42;
+    ctx.shadowOffsetY = 22;
+    ctx.fillStyle = "#ffffff";
+    roundRect(ctx, 70, 60, 760, 1130, 48);
+    ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    ctx.strokeStyle = "rgba(99, 102, 241, 0.14)";
+    ctx.lineWidth = 2;
+    roundRect(ctx, 70, 60, 760, 1130, 48);
+    ctx.stroke();
+
+    const headerGradient = ctx.createLinearGradient(95, 90, 805, 310);
+    headerGradient.addColorStop(0, "#312e81");
+    headerGradient.addColorStop(0.55, "#4f46e5");
+    headerGradient.addColorStop(1, "#7c3aed");
+    ctx.fillStyle = headerGradient;
+    roundRect(ctx, 105, 95, 690, 285, 36);
     ctx.fill();
 
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
-    ctx.lineWidth = 2;
-    roundRect(ctx, 70, 70, 760, 1110, 42);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+    roundRect(ctx, 535, 125, 210, 58, 29);
+    ctx.fill();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "700 38px Arial";
+    ctx.textAlign = "left";
+    ctx.fillText("GatePass", 145, 158);
+
+    ctx.font = "700 21px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("Return Pass", 640, 162);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(450, 244, 54, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "#4f46e5";
+    ctx.lineWidth = 12;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(426, 244);
+    ctx.lineTo(444, 262);
+    ctx.lineTo(478, 224);
     ctx.stroke();
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "700 42px Arial";
+    ctx.font = "700 48px Arial";
     ctx.textAlign = "center";
-    ctx.fillText("GatePass", 450, 150);
-
-    ctx.fillStyle = "#a5b4fc";
-    ctx.font = "700 34px Arial";
-    ctx.fillText("Return Pass", 450, 220);
-
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "700 46px Arial";
-    ctx.fillText("Exit Verified", 450, 305);
-
-    ctx.fillStyle = "#a5b4fc";
-    ctx.font = "500 24px Arial";
-    ctx.fillText("Your exit has been validated by the guard", 450, 348);
-
-    drawDetail(ctx, 130, 430, "Student", studentName || "Student");
-    drawDetail(ctx, 130, 515, "Roll No.", rollNo || "Not available");
-    drawDetail(ctx, 130, 600, "Exit Confirmed", exitTime || "Just now");
-    drawDetail(ctx, 130, 705, "From", leaveDetails?.from || "Not available");
-    drawDetail(ctx, 130, 790, "To", leaveDetails?.to || "Not available");
-    drawDetail(ctx, 130, 875, "Destination", leaveDetails?.place || "Not available");
-    drawDetail(ctx, 130, 960, "Reason", leaveDetails?.reason || "Not available", 620);
+    ctx.fillText("Exit Verified", 450, 335);
 
     ctx.fillStyle = "rgba(255, 255, 255, 0.78)";
     ctx.font = "500 23px Arial";
+    ctx.fillText("Validated by the security guard", 450, 365);
+
+    drawDetailCard(ctx, 115, 430, 670, 245, [
+      ["Student", studentName || "Student"],
+      ["Roll No.", rollNo || "Not available"],
+      ["Exit Confirmed", exitTime || "Just now"],
+    ]);
+
+    drawDetailCard(ctx, 115, 710, 670, 295, [
+      ["From", leaveDetails?.from || "Not available"],
+      ["To", leaveDetails?.to || "Not available"],
+      ["Destination", leaveDetails?.place || "Not available"],
+    ]);
+
+    ctx.fillStyle = "#eef2ff";
+    roundRect(ctx, 115, 1035, 670, 80, 24);
+    ctx.fill();
+    drawDetail(ctx, 145, 1070, "Reason", leaveDetails?.reason || "Not available", 610, "#312e81");
+
+    ctx.fillStyle = "#475569";
+    ctx.font = "500 22px Arial";
     ctx.textAlign = "center";
     wrapCanvasText(
       ctx,
       "Keep this return pass on your device and show it to the guard when returning to college.",
       450,
-      1090,
+      1162,
       650,
-      32
+      30
     );
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.38)";
-    ctx.font = "500 20px Arial";
-    ctx.fillText("Gate pass has been invalidated after verified exit", 450, 1150);
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "600 18px Arial";
+    ctx.fillText("Gate pass invalidated after verified exit", 450, 1230);
 
     const imageUrl = canvas.toDataURL("image/png");
     const link = document.createElement("a");
@@ -296,16 +346,52 @@ function drawDetail(
   y: number,
   label: string,
   value: string,
-  maxWidth = 620
+  maxWidth = 620,
+  valueColor = "#0f172a"
 ) {
   ctx.textAlign = "left";
-  ctx.fillStyle = "rgba(255, 255, 255, 0.45)";
+  ctx.fillStyle = "#64748b";
   ctx.font = "700 18px Arial";
   ctx.fillText(label.toUpperCase(), x, y);
 
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = valueColor;
   ctx.font = "700 26px Arial";
   wrapCanvasText(ctx, value, x, y + 38, maxWidth, 32);
+}
+
+function drawDetailCard(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  rows: [string, string][]
+) {
+  ctx.fillStyle = "#f8fafc";
+  roundRect(ctx, x, y, width, height, 28);
+  ctx.fill();
+
+  ctx.strokeStyle = "rgba(99, 102, 241, 0.14)";
+  ctx.lineWidth = 2;
+  roundRect(ctx, x, y, width, height, 28);
+  ctx.stroke();
+
+  const rowHeight = height / rows.length;
+
+  rows.forEach(([label, value], index) => {
+    const rowY = y + 50 + index * rowHeight;
+
+    if (index > 0) {
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.28)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + 30, y + index * rowHeight);
+      ctx.lineTo(x + width - 30, y + index * rowHeight);
+      ctx.stroke();
+    }
+
+    drawDetail(ctx, x + 30, rowY, label, value, width - 60);
+  });
 }
 
 function wrapCanvasText(
